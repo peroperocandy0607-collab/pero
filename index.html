@@ -126,6 +126,11 @@
     text-align:center;
     line-height:2;
     margin:0 0 44px;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+  }
+  .start-desc .line{
+    display:block;
   }
   .start-desc b{color:var(--ink); font-weight:600;}
 
@@ -441,9 +446,9 @@
     <div class="start-eyebrow">FORTUNE TELLER TYPE TEST</div>
     <h1 class="start-title">占い師タイプ診断</h1>
     <p class="start-desc">
-      全20問、すべて「はい」か「いいえ」で答えるだけ。<br>
-      直感で答えるほど、精度が上がります。<br>
-      あなたに向いているのは<b>15種類の占い師タイプ</b>のうち、どれ?
+      <span class="line">全20問、すべて「はい」か「いいえ」で答えるだけ。</span>
+      <span class="line">直感で答えるほど、精度が上がります。</span>
+      <span class="line">あなたは、<b>15種類の占い師タイプ</b>のうち、どれ?</span>
     </p>
     <button class="start-btn" id="startBtn">診断をはじめる</button>
     <div class="brand">Relife Hado</div>
