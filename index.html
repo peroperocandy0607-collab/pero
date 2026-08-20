@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>占い師タイプ診断 | Relife Hado</title>
+<meta name="description" content="全20問のYES/NOに答えるだけで、あなたに向いている占い師タイプがわかる診断。占星術師、タロット占い師、霊媒師など15タイプから診断します。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Relife Hado">
+<meta property="og:title" content="占い師タイプ診断 | Relife Hado">
+<meta property="og:description" content="全20問のYES/NOに答えるだけで、あなたに向いている占い師タイプがわかる診断。占星術師、タロット占い師、霊媒師など15タイプから診断します。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="占い師タイプ診断 | Relife Hado">
+<meta name="twitter:description" content="全20問のYES/NOに答えるだけで、あなたに向いている占い師タイプがわかる診断。">
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#1c1c1c;
+    --sub:#8a8a8a;
+    --line:#eaeaea;
+    --accent:#b8935a;
+    --accent-soft:#f7f1e8;
+    --card-shadow: 0 20px 60px rgba(0,0,0,0.06);
+    --radius: 20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic UI","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    min-height:100vh;
+  }
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .stage{
+    width:100%;
+    max-width:480px;
+  }
+
+  /* ---- back button ---- */
+  .back-btn{
+    display:none;
+    background:none;
+    border:none;
+    color:var(--sub);
+    font-size:12px;
+    letter-spacing:.05em;
+    cursor:pointer;
+    padding:4px 0;
+    margin-bottom:14px;
+    transition:color .15s ease;
+  }
+  .back-btn.show{ display:inline-block; }
+  .back-btn:hover{ color:var(--accent); }
+
+  /* ---- header / progress ---- */
+  .progress-wrap{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:36px;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .progress-wrap.show{opacity:1;}
+  .progress-track{
+    flex:1;
+    height:3px;
+    background:var(--line);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:var(--accent);
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label{
+    font-size:12px;
+    color:var(--sub);
+    letter-spacing:.05em;
+    white-space:nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- panels ---- */
+  .panel{
+    display:none;
+  }
+  .panel.active{
+    display:block;
+    animation: fadeUp .5s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(14px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ---- start screen ---- */
+  .start-eyebrow{
+    font-size:12px;
+    letter-spacing:.25em;
+    color:var(--accent);
+    text-align:center;
+    margin-bottom:18px;
+    font-weight:600;
+  }
+  .start-title{
+    font-size:28px;
+    font-weight:700;
+    text-align:center;
+    line-height:1.5;
+    margin:0 0 20px;
+    letter-spacing:.02em;
+  }
+  .start-desc{
+    font-size:14px;
+    color:var(--sub);
+    text-align:center;
+    line-height:2;
+    margin:0 0 44px;
+  }
+  .start-desc b{color:var(--ink); font-weight:600;}
+
+  /* ---- question card ---- */
+  .q-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:52px 32px 40px;
+    box-shadow:var(--card-shadow);
+    text-align:center;
+    min-height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .q-text{
+    font-size:19px;
+    line-height:1.85;
+    font-weight:500;
+    letter-spacing:.02em;
+  }
+
+  .btn-row{
+    display:flex;
+    gap:14px;
+    margin-top:28px;
+  }
+  .btn{
+    flex:1;
+    padding:20px 0;
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.08em;
+    cursor:pointer;
+    color:var(--ink);
+    transition: all .18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:hover{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    transform:translateY(-2px);
+  }
+  .btn:active{
+    transform:translateY(0px) scale(.98);
+  }
+  .btn.yes{color:var(--accent);}
+  .btn-sub{
+    display:block;
+    font-size:10px;
+    font-weight:400;
+    color:var(--sub);
+    margin-top:4px;
+    letter-spacing:.15em;
+  }
+
+  .start-btn{
+    display:block;
+    width:100%;
+    padding:20px 0;
+    border-radius:16px;
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.12em;
+    cursor:pointer;
+    transition:transform .18s ease, background .18s ease;
+  }
+  .start-btn:hover{ transform:translateY(-2px); background:#000;}
+
+  /* ---- result screen ---- */
+  .result-icon{
+    width:104px;
+    height:104px;
+    margin:0 auto 24px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--accent);
+  }
+  .result-icon svg{ width:56px; height:56px; }
+  .result-eyebrow{
+    font-size:12px;
+    letter-spacing:.25em;
+    color:var(--accent);
+    text-align:center;
+    margin-bottom:14px;
+    font-weight:600;
+  }
+  .result-alias{
+    font-size:13px;
+    font-weight:600;
+    text-align:center;
+    margin:0 0 6px;
+    color:var(--sub);
+    letter-spacing:.05em;
+  }
+  .result-name{
+    font-size:26px;
+    font-weight:700;
+    text-align:center;
+    line-height:1.5;
+    margin:0 0 10px;
+  }
+  .result-catch{
+    font-size:14px;
+    color:var(--accent);
+    text-align:center;
+    margin:0 0 28px;
+    font-weight:600;
+    letter-spacing:.03em;
+  }
+  .result-card{
+    background:var(--accent-soft);
+    border-radius:var(--radius);
+    padding:32px 28px;
+    margin-bottom:20px;
+  }
+  .result-desc{
+    font-size:14.5px;
+    line-height:2.1;
+    color:#3a3a3a;
+    margin:0;
+  }
+
+  .history-card{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    margin-bottom:28px;
+  }
+  .history-label{
+    font-size:11px;
+    letter-spacing:.15em;
+    color:var(--sub);
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .history-text{
+    font-size:12.5px;
+    line-height:1.95;
+    color:#5c5c5c;
+    margin:0 0 16px;
+  }
+  .people-label{
+    font-size:11px;
+    letter-spacing:.15em;
+    color:var(--sub);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .people-text{
+    font-size:12.5px;
+    line-height:1.8;
+    color:var(--ink);
+    font-weight:600;
+    margin:0;
+  }
+
+  .result-scores{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 26px;
+    margin-bottom:28px;
+  }
+  .result-scores-title{
+    font-size:11px;
+    letter-spacing:.15em;
+    color:var(--sub);
+    margin-bottom:14px;
+    font-weight:700;
+  }
+  .score-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+    font-size:12.5px;
+  }
+  .score-row:last-child{margin-bottom:0;}
+  .score-name{
+    width:120px;
+    flex-shrink:0;
+    color:var(--sub);
+  }
+  .score-name.top{color:var(--ink); font-weight:700;}
+  .score-bar-track{
+    flex:1;
+    height:6px;
+    background:var(--line);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .score-bar-fill{
+    height:100%;
+    background:#d2d2d2;
+    border-radius:3px;
+  }
+  .score-bar-fill.top{background:var(--accent);}
+
+  .analysis-card{
+    background:var(--accent-soft);
+    border-radius:var(--radius);
+    padding:22px 26px;
+    margin-bottom:28px;
+  }
+  .analysis-label{
+    font-size:11px;
+    letter-spacing:.15em;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .analysis-text{
+    font-size:12.5px;
+    line-height:2;
+    color:#4a3f30;
+    margin:0;
+    white-space:pre-line;
+  }
+
+  /* ---- share ---- */
+  .share-section{
+    margin-bottom:16px;
+  }
+  .share-label{
+    font-size:11px;
+    letter-spacing:.15em;
+    color:var(--sub);
+    text-align:center;
+    margin-bottom:12px;
+    font-weight:700;
+  }
+  .share-row{
+    display:flex;
+    gap:10px;
+  }
+  .share-btn{
+    flex:1;
+    padding:14px 0;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.05em;
+    cursor:pointer;
+    color:var(--ink);
+    transition:all .18s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+  .share-btn:hover{ border-color:var(--accent); background:var(--accent-soft); transform:translateY(-2px);}
+  .share-btn svg{ width:14px; height:14px; }
+  .share-btn.sns{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .share-btn.sns:hover{ background:#000; border-color:#000; }
+  .share-btn.line{ background:#06C755; border-color:#06C755; color:#fff; }
+  .share-btn.line:hover{ background:#05b34c; border-color:#05b34c; }
+  .share-toast{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--accent);
+    height:16px;
+    margin-top:10px;
+    opacity:0;
+    transition:opacity .25s ease;
+  }
+  .share-toast.show{ opacity:1; }
+  .shared-badge{
+    display:block;
+    text-align:center;
+    font-size:11px;
+    letter-spacing:.1em;
+    color:var(--sub);
+    background:var(--accent-soft);
+    border-radius:10px;
+    padding:8px 12px;
+    margin-bottom:20px;
+  }
+
+  .brand{
+    text-align:center;
+    margin-top:20px;
+    font-size:11px;
+    color:#c9c9c9;
+    letter-spacing:.15em;
+    font-weight:600;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <button class="back-btn" id="backBtn">&larr; 戻る</button>
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 20</div>
+  </div>
+
+  <!-- START -->
+  <div class="panel active" id="panel-start">
+    <div class="start-eyebrow">FORTUNE TELLER TYPE TEST</div>
+    <h1 class="start-title">占い師タイプ診断</h1>
+    <p class="start-desc">
+      全20問、すべて「はい」か「いいえ」で答えるだけ。<br>
+      直感で答えるほど、精度が上がります。<br>
+      あなたに向いているのは<b>15種類の占い師タイプ</b>のうち、どれ?
+    </p>
+    <button class="start-btn" id="startBtn">診断をはじめる</button>
+    <div class="brand">Relife Hado</div>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="panel" id="panel-question">
+    <div class="q-card">
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn yes" id="yesBtn">YES<span class="btn-sub">はい</span></button>
+      <button class="btn no" id="noBtn">NO<span class="btn-sub">いいえ</span></button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="panel" id="panel-result">
+    <div class="shared-badge" id="sharedBadge" style="display:none;">シェアされた診断結果です</div>
+    <div class="result-icon" id="resIcon"></div>
+    <div class="result-eyebrow">YOUR RESULT</div>
+    <div class="result-alias" id="resAlias"></div>
+    <h2 class="result-name" id="resName"></h2>
+    <p class="result-catch" id="resCatch"></p>
+    <div class="result-card">
+      <p class="result-desc" id="resDesc"></p>
+    </div>
+
+    <div class="history-card">
+      <div class="history-label">占術の歴史</div>
+      <p class="history-text" id="resHistory"></p>
+      <div class="people-label">代表的な人物</div>
+      <p class="people-text" id="resPeople"></p>
+    </div>
+
+    <div class="result-scores" id="resScoresWrap">
+      <div class="result-scores-title">相性スコア内訳</div>
+      <div id="resScores"></div>
+    </div>
+    <div class="analysis-card" id="analysisCard">
+      <div class="analysis-label">分析結果</div>
+      <p class="analysis-text" id="resAnalysis"></p>
+    </div>
+    <div class="share-section">
+      <div class="share-label">この結果をシェアする</div>
+      <div class="share-row">
+        <button class="share-btn sns" id="shareSns">SNSでシェア</button>
+        <button class="share-btn line" id="shareLine">LINEで送る</button>
+        <button class="share-btn" id="shareCopy">URLをコピー</button>
+      </div>
+      <div class="share-toast" id="shareToast">URLをコピーしました</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
